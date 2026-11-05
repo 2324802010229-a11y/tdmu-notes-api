@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Bài 1 - Hello Cloud API (MSSV: 2324802010229)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; padding: 20px; max-width: 1000px; margin: 0 auto; color: #333; }
+        h1, h2 { color: #0366d6; border-bottom: 2px solid #eaecef; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #dfe2e5; padding: 12px; text-align: left; }
+        th { background-color: #f6f8fa; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .nist-card { background: #f1f8ff; border-left: 4px solid #0366d6; padding: 12px 16px; margin-bottom: 12px; border-radius: 0 4px 4px 0; }
+        .nist-title { font-weight: bold; color: #0550ae; }
+    </style>
+</head>
+<body>
+    <h1>Báo cáo Bài 1: Hello Cloud API & Đối chiếu 5 Đặc tính NIST</h1>
+    <p><strong>Sinh viên thực hiện:</strong> Dương Đức Hoàng | <strong>MSSV:</strong> 2324802010229</p>
+
+    <h2>1. Bảng đối chiếu Môi trường</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tiêu chí</th>
+                <th>Máy cá nhân (Local)</th>
+                <th>GitHub Codespaces</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Thời gian khởi tạo môi trường</td>
+                <td>30 - 60 phút (Cài thủ công Node.js, VS Code, Git)</td>
+                <td>~ 1 - 2 phút (Khởi tạo sẵn qua Devcontainer)</td>
+            </tr>
+            <tr>
+                <td>Số CPU & RAM (lấy từ API)</td>
+                <td>8 CPUs / 16.0 GB RAM (Cấu hình máy vật lý)</td>
+                <td>2 CPUs / 8.0 GB RAM (Cấu hình mặc định tiêu chuẩn)</td>
+            </tr>
+            <tr>
+                <td>Hệ điều hành</td>
+                <td>Windows 11 / macOS</td>
+                <td>Linux (Debian / Ubuntu Container)</td>
+            </tr>
+            <tr>
+                <td>Cách truy cập từ thiết bị khác</td>
+                <td>Cấu hình Router, NAT Port hoặc dùng Ngrok</td>
+                <td>Bật Public Port Visibility trên đường dẫn github.dev</td>
+            </tr>
+            <tr>
+                <td>Chi phí & Cách đo lường</td>
+                <td>Tiền điện máy tính, chi phí mua phần cứng vật lý</td>
+                <td>Tính theo số Core-giờ (Core-Hours) sử dụng thực tế (Billing)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Đối chiếu 5 Đặc tính Điện toán Đám mây theo NIST</h2>
+    
+    <div class="nist-card">
+        <span class="nist-title">1. On-demand Self-service (Tự phục vụ theo yêu cầu):</span>
+        <p>Sinh viên tự nhấp chuột tạo mới một môi trường máy ảo Codespaces trên GitHub chỉ trong chưa đầy 2 phút mà không cần gửi yêu cầu phê duyệt hay can thiệp từ quản trị viên hệ thống.</p>
+    </div>
+
+    <div class="nist-card">
+        <span class="nist-title">2. Broad Network Access (Truy cập mạng rộng):</span>
+        <p>Có thể truy cập và lập trình môi trường Codespaces hoặc gọi tới API thành phẩm thông qua trình duyệt mạng trên cả máy tính bàn lẫn thiết bị di động (điện thoại) ở bất kỳ đâu có Internet.</p>
+    </div>
+
+    <div class="nist-card">
+        <span class="nist-title">3. Resource Pooling (Gộp tài nguyên):</span>
+        <p>Máy ảo Codespace chạy trên hạ tầng đám mây hạ tầng dùng chung (Multi-tenant) của Microsoft Azure/GitHub, nơi CPU và RAM được cấp phát động từ một kho tài nguyên khổng lồ cô lập cho từng người dùng.</p>
+    </div>
+
+    <div class="nist-card">
+        <span class="nist-title">4. Rapid Elasticity (Co giãn nhanh):</span>
+        <p>Có thể nâng cấp cấu hình máy ảo (từ 2-core lên 4-core, 8-core) hoặc xóa/tái tạo môi trường làm việc chỉ với một vài thao tác tức thì khi nhu cầu tài nguyên thay đổi.</p>
+    </div>
+
+    <div class="nist-card">
+        <span class="nist-title">5. Measured Service (Dịch vụ đo lường được):</span>
+        <p>Hệ thống tự động theo dõi, đo lường chính xác từng phút hoạt động và số lượng Core-giờ (Core-Hours) tiêu thụ được hiển thị rõ ràng tại mục Settings -> Billing của tài khoản GitHub.</p>
+    </div>
+</body>
+</html>
