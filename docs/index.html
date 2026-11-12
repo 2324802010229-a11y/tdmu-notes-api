@@ -83,5 +83,118 @@
         <span class="nist-title">5. Measured Service (Dịch vụ đo lường được):</span>
         <p>Hệ thống tự động theo dõi, đo lường chính xác từng phút hoạt động và số lượng Core-giờ (Core-Hours) tiêu thụ được hiển thị rõ ràng tại mục Settings -> Billing của tài khoản GitHub.</p>
     </div>
+    <hr style="margin: 40px 0; border: 0; border-top: 2px solid #e1e4e8;">
+
+<section id="bai-2">
+  <h2>Bài 2. Ảo hóa, Container và Mô phỏng Trung tâm Dữ liệu</h2>
+  <p>
+    <strong>Package GHCR công khai:</strong>
+    <a href="https://github.com/users/2324802010229-a11y/packages/container/package/notes-api" target="_blank">
+      https://github.com/users/2324802010229-a11y/packages/container/package/notes-api
+    </a>
+  </p>
+
+  <h3>1. Dockerfile đóng gói ứng dụng</h3>
+  <pre style="background: #f6f8fa; padding: 14px; border-radius: 6px; border: 1px solid #d0d7de; overflow-x: auto;"><code>FROM node:22-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY src ./src
+ENV PORT=3000
+EXPOSE 3000
+USER node
+CMD ["node", "src/server.js"]</code></pre>
+
+  <h3>2. Bảng đối chiếu Codespace (Máy ảo) và Container <code>notes2</code></h3>
+  <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+    <thead style="background-color: #f0f6fc;">
+      <tr>
+        <th style="text-align: left;">Tiêu chí</th>
+        <th style="text-align: left;">Codespace (máy ảo)</th>
+        <th style="text-align: left;">Container <code>notes2</code></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Thời gian khởi động</strong></td>
+        <td>~1 – 2 phút (khởi tạo devcontainer từ Bài 1)</td>
+        <td>~0.3 – 0.5 giây (đo bằng <code>time docker run --rm notes-api:1.0 node -e "1"</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Kích thước</strong></td>
+        <td>15 GB/tháng hạn mức đĩa (hệ điều hành + dev tools)</td>
+        <td>~142 MB (cột <code>SIZE</code> của <code>docker images</code> dựa trên <code>node:22-alpine</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Nhân hệ điều hành</strong></td>
+        <td>Riêng biệt cho máy ảo Linux host (<code>6.8.0-1070-azure</code>)</td>
+        <td>Dùng chung nhân Linux với máy chủ (<code>uname -r</code> trong và ngoài container đều trả về <code>6.8.0-1070-azure</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Mức cô lập</strong></td>
+        <td>Cô lập hoàn toàn ở tầng phần cứng ảo hóa (Hypervisor), có kernel riêng</td>
+        <td>Cô lập ở mức tiến trình (Process-level) thông qua Linux Namespaces và cgroups (giới hạn 0.5 CPU, 128 MiB RAM)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3. Bảng kết quả mô phỏng CloudSim Plus (<code>BasicFirstExample</code>)</h3>
+  <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+    <thead style="background-color: #f0f6fc;">
+      <tr>
+        <th style="text-align: center; width: 60px;">Lần</th>
+        <th style="text-align: left;">Thay đổi</th>
+        <th style="text-align: center;">Thời điểm hoàn thành cloudlet cuối (giây mô phỏng)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align: center;">0</td>
+        <td>Giữ nguyên (<code>HOSTS=1, HOST_CORES=8, VMS=2, VM_CORES=4, CLOUDLETS=4</code>)</td>
+        <td style="text-align: center;"><strong>20.1</strong> (mô phỏng kết thúc tại 20.22s)</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">1</td>
+        <td>Nhân đôi <code>VMS</code> (<code>VMS = 4</code>)</td>
+        <td style="text-align: center;"><strong>45.6</strong> (mô phỏng kết thúc tại 45.71s)</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">2</td>
+        <td>Nhân đôi <code>CLOUDLETS</code> (<code>CLOUDLETS = 8</code>)</td>
+        <td style="text-align: center;"><strong>40.1</strong> (mô phỏng kết thúc tại 40.22s)</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">3</td>
+        <td>Đổi bộ lập lịch cloudlet sang <code>CloudletSchedulerSpaceShared</code></td>
+        <td style="text-align: center;"><strong>20.1</strong> (mô phỏng kết thúc tại 20.22s)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>4. Trả lời câu hỏi phản biện</h3>
+  <div style="background: #f0f6fc; padding: 14px; border-radius: 6px; margin-bottom: 12px;">
+    <p><strong>1. Vì sao API trong container <code>notes2</code> vẫn báo <code>memoryGB</code> bằng RAM máy chủ dù đã giới hạn 128 MB? Ứng dụng Java hoặc Node.js cần lưu ý gì?</strong></p>
+    <p>
+      Hàm <code>os.totalmem()</code> và <code>os.cpus()</code> của Node.js đọc trực tiếp thông số từ <code>/proc/meminfo</code> và <code>/proc/cpuinfo</code> của nhân Linux dùng chung (vốn phản ánh phần cứng máy chủ host), trong khi giới hạn <code>--memory=128m</code> của Docker được áp đặt qua <strong>Linux cgroups</strong> (<code>/sys/fs/cgroup</code>).<br>
+      <em>Lưu ý thực tế:</em> Với <strong>Node.js</strong>, V8 mặc định tính kích thước Heap theo RAM máy chủ nên cần truyền cờ <code>--max-old-space-size</code> (ví dụ 96 MB) để tránh bị OOM Killer (Exit Code 137) tiêu diệt container. Với <strong>Java (JVM)</strong>, cần đảm bảo bật nhận diện container (<code>-XX:+UseContainerSupport</code>, mặc định từ Java 11+) và giới hạn tỷ lệ Heap qua <code>-XX:MaxRAMPercentage=75.0</code> để chừa bộ nhớ cho hệ điều hành và vùng nhớ native.
+    </p>
+  </div>
+
+  <div style="background: #f0f6fc; padding: 14px; border-radius: 6px; margin-bottom: 12px;">
+    <p><strong>2. <code>Time-shared</code> và <code>Space-shared</code> khác nhau ra sao trong kết quả lần 3? Nhà cung cấp đám mây hướng thị trường sẽ chọn chính sách nào cho gói giá rẻ, vì sao?</strong></p>
+    <p>
+      <strong>Time-shared</strong> cho phép nhiều tác vụ chạy đồng thời trên cùng lõi CPU thông qua chia lát cắt thời gian (context switching), khiến tốc độ từng tác vụ giảm khi tải tăng (như Lần 2 tăng gấp đôi lên 40.1s). Ngược lại, <strong>Space-shared</strong> cấp phát độc quyền lõi xử lý cho từng tác vụ cho đến khi hoàn tất; ở Lần 3, 2 VM có tổng 8 lõi vừa khít cho 4 cloudlet (mỗi cloudlet 2 lõi) nên cả 4 chạy song song không phải chờ hàng đợi và hoàn thành đúng 20.1s.<br>
+      <em>Lựa chọn của nhà cung cấp:</em> Với gói giá rẻ, nhà cung cấp chọn <strong>Time-shared</strong> (kết hợp CPU overcommitment / burstable instances) vì người dùng phổ thông hiếm khi dùng 100% CPU liên tục, giúp nhồi nhiều máy ảo lên một máy chủ vật lý để tối ưu chi phí hạ tầng và giảm giá bán.
+    </p>
+  </div>
+
+  <div style="background: #f0f6fc; padding: 14px; border-radius: 6px;">
+    <p><strong>3. Mô phỏng giúp ích gì trước khi thuê hạ tầng thật, và kết quả mô phỏng có thể sai lệch với thực tế ở điểm nào?</strong></p>
+    <p>
+      <strong>Lợi ích:</strong> Cho phép hoạch định dung lượng (capacity planning), kiểm thử kịch bản quá tải (như Lần 1 khi thiếu lõi Host làm trễ thời gian hoàn thành lên 45.6s) và đánh giá chính sách lập lịch mà không tốn chi phí thuê máy chủ thật.<br>
+      <strong>Điểm sai lệch:</strong> Mô phỏng tính toán lý tưởng theo tỷ lệ <code>MI / MIPS</code>, bỏ qua độ trễ I/O ổ đĩa, nghẽn băng thông mạng, chi phí khởi động (cold start) container/VM và hiện tượng tranh chấp tài nguyên phần cứng ngầm ("noisy neighbor" trên CPU cache/RAM bus) trong trung tâm dữ liệu thực tế.
+    </p>
+  </div>
+</section>
 </body>
 </html>
